@@ -14,16 +14,21 @@ module.exports = {
 
   addTodos: async (req, res, next) => {
     try {
-      const todoObj = {
-        id: uuidv4(),
-        name: req.body.name,
-        dueDate: req.body.dueDate,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      if(!req.body.name){
+        throw new Error('todo name is required')
+      } else if (!req.body.dueDate){
+        throw new Error('todo due date is required')
+      } else {
+        const todoObj = {
+          name: req.body.name,
+          dueDate: req.body.dueDate,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+        todo.create(todoObj).then((response)=>{
+          res.status(200).send('todo created successfully');
+        })
       }
-      todo.create(todoObj).then((response)=>{
-        res.status(200).send('todo created successfully');
-      })
     } catch (e) {
       res.status(400).send(e)
     }
@@ -31,15 +36,19 @@ module.exports = {
 
   updateTodos: async (req, res, next) => {
     try {
-      todo.updateOne({id: req.body.id},{
-        id: req.body.id,
-        name: req.body.name,
-        dueDate: req.body.dueDate,
-        createdAt: req.body.createdAt,
-        updatedAt: new Date(),
-      }).then((response) => {
-        res.status(200).send('todo updated');
-      })
+      if(!req.query.id){
+        throw new Error('todo id is required')
+      } else {
+        todo.updateOne({_id: req.query.id},{
+          _id: req.body.id,
+          name: req.body.name,
+          dueDate: req.body.dueDate,
+          createdAt: req.body.createdAt,
+          updatedAt: new Date(),
+        }).then((response) => {
+          res.status(200).send('todo updated');
+        })
+      }
     } catch (e){
       res.status(400).send(e);
     }
@@ -47,9 +56,13 @@ module.exports = {
 
   deleteTodos: async (req, res, next) => {
     try {
-      todo.deleteOne({ id: req.query.id }).then((response) => {
-        res.status().send('todo deleted')
-      })
+      if(!req.query.id){
+        throw new Error('todo id is required')
+      } else {
+        todo.deleteOne({ _id: req.query.id }).then((response) => {
+          res.status().send('todo deleted')
+        })
+      }
     } catch (e) {
       res.status(400).send(e)
     }
